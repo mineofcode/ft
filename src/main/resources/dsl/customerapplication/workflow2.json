@@ -1,0 +1,155 @@
+{
+  "id": "customerapplication",
+  "name": "Customer Application Workflow",
+  "version": "1.1",
+  "timeouts": {
+    "workflowExecTimeout": {
+      "duration": "PT10M"
+    },
+    "actionExecTimeout": "PT10S"
+  },
+  "retries": [
+    {
+      "name": "WorkflowRetries",
+      "delay": "PT3S",
+      "maxAttempts": 10
+    }
+  ],
+  "states": [
+    {
+      "type": "event",
+      "onEvents": [
+        {
+          "eventRefs": [
+            "OnApplicationStart"
+          ],
+
+          "actions": []
+        }
+      ],
+      "name": "s1667302205526",
+      "metadata": {
+        "jq": "${ .customer.name == \"pratik\" }"
+      },
+      "transition": "s1667302208171"
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "CheckCustomerInfo",
+          "functionRef": "CheckCustomerInfo"
+        }
+      ],
+      "name": "s1667302208171",
+      "transition": "s1667302434818"
+    },
+    {
+      "type": "switch",
+      "dataConditions": [
+        {
+          "condition": "${ .customer.age >= 20 }",
+          "transition": "s1667302489936"
+        },
+        {
+          "condition": "${ .customer.age < 20 }",
+          "transition": "s1667302520444"
+        }
+      ],
+      "name": "s1667302434818"
+
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "ApproveApplication",
+          "functionRef": "ApproveApplication"
+        }
+      ],
+      "name": "s1667302489936",
+      "transition": "s1667302563587"
+    },
+    {
+      "type": "event",
+      "onEvents": [
+        {
+          "eventRefs": [
+            "OnDocumentUpload"
+          ],
+          "actions": []
+        }
+      ],
+      "name": "s1667302563587",
+
+      "transition": "s1667302603917"
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "FileUpload",
+          "functionRef": "RejectApplication"
+        }
+      ],
+      "name": "s1667302603917",
+      "transition": "s1667370039980"
+    },
+    {
+      "type": "event",
+      "onEvents": [
+        {
+          "eventRefs": [
+            "ABCD"
+          ],
+          "actions": []
+        }
+      ],
+      "name": "s1667370039980",
+
+      "end": true
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "RejectApplication",
+          "functionRef": "RejectApplication"
+        }
+      ],
+      "name": "s1667302520444",
+      "end": true
+    }
+  ],
+  "functions": [
+    {
+      "name": "CheckCustomerInfo",
+      "type": "rest"
+    },
+    {
+      "name": "ApproveApplication",
+      "type": "rest"
+    },
+    {
+      "name": "RejectApplication",
+      "type": "rest"
+    }
+  ],
+  "events": [
+    {
+      "name": "OnApplicationStart",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    },
+    {
+      "name": "OnDocumentUpload",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    },
+    {
+      "name": "ABCD",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    }
+  ]
+}

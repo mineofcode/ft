@@ -1,0 +1,146 @@
+{
+  "id": "customerapplication",
+  "name": "Customer Application Workflow",
+  "version": "1.1",
+  "timeouts": {
+    "workflowExecTimeout": {
+      "duration": "PT10M"
+    },
+    "actionExecTimeout": "PT10S"
+  },
+  "retries": [
+    {
+      "name": "WorkflowRetries",
+      "delay": "PT3S",
+      "maxAttempts": 10
+    }
+  ],
+  "states": [
+    {
+      "name": "NewCustomerApplication",
+      "type": "event",
+      "onEvents": [{
+        "eventRefs": ["NewApplicationEvent"],
+        "actionMode": "parallel",
+        "actions":[
+          {
+            "name": "Invoke Check Customer Info Function",
+            "functionRef": "CheckCustomerInfo"
+          },
+          {
+            "name": "Invoke Update Application Info Function",
+            "functionRef": "UpdateApplicationInfo"
+          }
+        ]
+      }],
+      "transition": "MakeApplicationDecision"
+    },
+    {
+      "name": "MakeApplicationDecision",
+      "type": "switch",
+      "dataConditions": [
+        {
+          "condition": "${ .customer.age >= 20 }",
+          "transition": "ApproveApplication"
+        },
+        {
+          "condition": "${ .customer.age < 20 }",
+          "transition": "RejectApplication"
+        }
+      ],
+      "defaultCondition": {
+        "transition": "RejectApplication"
+      }
+    },
+    {
+      "name": "ApproveApplication",
+      "type": "operation",
+      "actions": [
+        {
+          "name": "Invoke Approve Application Function",
+          "functionRef": "ApproveApplication",
+          "sleep": {
+            "before": "PT1S"
+          }
+        }
+      ],
+      "transition": "WaitForInput"
+    },
+    {
+      "name": "RejectApplication",
+      "type": "operation",
+      "actions": [
+        {
+          "name": "Invoke Reject Application Function",
+          "functionRef": "RejectApplication",
+          "sleep": {
+            "before": "PT1S"
+          }
+        }
+      ],
+      "end": true
+    },
+    {
+      "name": "WaitForInput",
+      "type": "event",
+      "onEvents": [{
+        "eventRefs": ["OnWaitEvent"]
+      }],
+      "transition": "FileUpload"
+    },
+    {
+      "name": "FileUpload",
+      "type": "operation",
+      "actions": [
+        {
+          "name": "Invoke Reject Application Function",
+          "functionRef": "RejectApplication",
+          "sleep": {
+            "before": "PT1S"
+          }
+        }
+      ],
+      "end": true
+    }
+  ],
+  "functions": [
+    {
+      "name": "CheckCustomerInfo",
+      "type": "rest"
+    },
+    {
+      "name": "UpdateApplicationInfo",
+      "type": "rest"
+    },
+    {
+      "name": "ApproveApplication",
+      "type": "rest"
+    },
+    {
+      "name": "RejectApplication",
+      "type": "rest"
+    },
+    {
+      "name": "QueryCustomerName",
+      "type": "expression",
+      "operation": "${ .customer.name }"
+    },
+    {
+      "name": "QueryCustomerAge",
+      "type": "expression",
+      "operation": "${ .customer.age }"
+    }
+  ],
+  "events": [
+    {
+      "name": "OnWaitEvent",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    },
+    {
+      "name": "NewApplicationEvent",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    }
+  ]
+}

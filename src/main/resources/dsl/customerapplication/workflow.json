@@ -1,0 +1,181 @@
+{
+  "id": "customerapplication",
+  "name": "Customer Application Workflow",
+  "version": "1.1",
+  "timeouts": {
+    "workflowExecTimeout": {
+      "duration": "PT10M"
+    },
+    "actionExecTimeout": "PT10S"
+  },
+  "retries": [
+    {
+      "name": "WorkflowRetries",
+      "delay": "PT3S",
+      "maxAttempts": 10
+    }
+  ],
+  "states": [
+    {
+      "type": "event",
+      "onEvents": [
+        {
+          "eventRefs": [
+            "OnApplicationStart"
+          ],
+          "actions": []
+        }
+      ],
+      "name": "s1667302205526",
+      "metadata": {
+        "name": "NewCustomerApplication"
+      },
+      "transition": "s1667302208171"
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "CheckCustomerInfo",
+          "functionRef": "CheckCustomerInfo"
+        }
+      ],
+      "name": "s1667302208171",
+      "metadata": {
+        "name": "CheckCustomerInfo"
+      },
+      "transition": "s1667302434818"
+    },
+    {
+      "type": "switch",
+      "dataConditions": [
+        {
+          "condition": "${ .incomming.customer.name== \"pratik\" }",
+          "transition": "s1667635546415"
+        },
+        {
+          "condition": "${ .incomming.customer.name == \"naik\" }",
+          "transition": "s1667302520444"
+        }
+      ],
+      "name": "s1667302434818",
+      "metadata": {
+        "name": "MakeApplicationDecision"
+      }
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "Approved Application",
+          "functionRef": "ApproveApplication"
+        }
+      ],
+      "name": "s1667635546415",
+      "metadata": {
+        "name": "Approved Application"
+      },
+      "transition": "s1667634773399"
+    },
+    {
+      "type": "sleep",
+      "duration": "PT10S",
+      "name": "s1667634773399",
+      "metadata": {
+        "name": "Sleep"
+      },
+      "transition": "s1667302563587"
+    },
+    {
+      "type": "event",
+      "onEvents": [
+        {
+          "eventRefs": [
+            "OnDocumentUpload"
+          ],
+          "actions": []
+        }
+      ],
+      "name": "s1667302563587",
+      "metadata": {
+        "name": "WaitForInput"
+      },
+      "transition": "s1667302603917"
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "FileUpload",
+          "functionRef": "RejectApplication"
+        }
+      ],
+      "name": "s1667302603917",
+      "metadata": {
+        "name": "FileUpload"
+      },
+      "transition": "s1667370039980"
+    },
+    {
+      "type": "event",
+      "onEvents": [
+        {
+          "eventRefs": [
+            "ABCD"
+          ],
+          "actions": []
+        }
+      ],
+      "name": "s1667370039980",
+      "metadata": {
+        "name": "Input Signal"
+      },
+      "end": true
+    },
+    {
+      "type": "operation",
+      "actions": [
+        {
+          "name": "Reject Application",
+          "functionRef": "RejectApplication"
+        }
+      ],
+      "name": "s1667302520444",
+      "metadata": {
+        "name": "Reject Application"
+      },
+      "end": true
+    }
+  ],
+  "functions": [
+    {
+      "name": "CheckCustomerInfo",
+      "type": "rest"
+    },
+    {
+      "name": "ApproveApplication",
+      "type": "rest"
+    },
+    {
+      "name": "RejectApplication",
+      "type": "rest"
+    }
+  ],
+  "events": [
+    {
+      "name": "OnApplicationStart",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    },
+    {
+      "name": "OnDocumentUpload",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    },
+    {
+      "name": "ABCD",
+      "type": "com.fasterxml.jackson.databind.JsonNode",
+      "source": "applicationsSource"
+    }
+  ]
+}
