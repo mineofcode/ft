@@ -1,5 +1,6 @@
 package com.ftteporal.ft.workflow;
 
+
 import com.ftteporal.ft.model.ActionDataModel;
 import io.temporal.workflow.QueryMethod;
 import io.temporal.workflow.SignalMethod;
@@ -9,16 +10,15 @@ import io.temporal.workflow.WorkflowMethod;
 import java.util.HashMap;
 
 @WorkflowInterface
-public interface TestWorkFlow {
-    String TASK_LIST = "Test2";
+public interface SignalWorkflow {
 
     @WorkflowMethod()
-    void start(ActionDataModel dt) ;
+    void start(String data) ;
 
     @SignalMethod
-    void genericSignal(HashMap action);
+    void genericSignal(String data);
 
     @QueryMethod
-    HashMap<String, Object> getSession();
+    String getData();
 
 }

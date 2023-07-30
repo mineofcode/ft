@@ -281,7 +281,9 @@ public class DynamicDSLWorkflow implements DynamicWorkflow {
                                 ExternalWorkflowStub externalWorkflowStub =
                                         Workflow.newUntypedExternalWorkflowStub(operationParts[0]);
                                 externalWorkflowStub.signal(operationParts[1], workflowData.getValue());
-                            } else {
+                            }
+
+                            else {
                                 if (action.getSleep() != null && action.getSleep().getBefore() != null) {
                                     Workflow.sleep(Duration.parse(action.getSleep().getBefore()));
                                 }

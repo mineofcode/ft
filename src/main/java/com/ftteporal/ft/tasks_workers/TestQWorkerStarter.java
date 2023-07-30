@@ -4,6 +4,7 @@ import com.ftteporal.ft.activities.DynamicTestActivity;
 import com.ftteporal.ft.activities.TestActivitiesImpl;
 import com.ftteporal.ft.common.Constants;
 import com.ftteporal.ft.workflow.TestWorkFlowImpl;
+import com.ftteporal.ft.workflow.TestWorkFlowImpl2;
 import com.google.protobuf.util.Durations;
 import io.temporal.api.namespace.v1.NamespaceConfig;
 import io.temporal.api.namespace.v1.UpdateNamespaceInfo;
@@ -70,7 +71,7 @@ public class TestQWorkerStarter {
 
     private void createWorkers() {
         Worker worker = workerFactory.newWorker(TASK_QUEUE, workerOptions);
-        worker.registerWorkflowImplementationTypes(TestWorkFlowImpl.class);
+        worker.registerWorkflowImplementationTypes(TestWorkFlowImpl2.class);
         worker.registerActivitiesImplementations(new TestActivitiesImpl(ctx),new DynamicTestActivity(ctx) );
     }
 

@@ -36,7 +36,7 @@ import java.util.HashSet;
 
 import static utils.DslWorkflowUtils.*;
 
-@RestController
+// @RestController
 public class TestWorkFlowController {
     private final WorkflowClient workflowClient;
 
@@ -61,6 +61,8 @@ public class TestWorkFlowController {
     void init() {
         System.out.println("started");
 
+
+
         io.temporal.worker.Worker worker = factory.newWorker(FtApplication.DEFAULT_TASK_QUEUE_NAME);
         worker.registerWorkflowImplementationTypes(DynamicDSLWorkflow.class);
         worker.registerActivitiesImplementations(new DynamicTestActivity(ctx));
@@ -70,13 +72,10 @@ public class TestWorkFlowController {
 
     @PostMapping("/startWF")
     public ResponseEntity<WorkflowResponse> startWorkflow(@RequestBody ActionDataModel request) {
-
-
         WorkflowOptions workflowOptions = WorkflowOptions.newBuilder()
 
                 .setTaskQueue(TestWorkFlow.TASK_LIST)
                 .setWorkflowExecutionTimeout(Duration.ofDays(5))
-
                 .setWorkflowId(request.getId())
                 .build();
         TestWorkFlow workflow = workflowClient.newWorkflowStub(TestWorkFlow.class, workflowOptions);
@@ -85,6 +84,24 @@ public class TestWorkFlowController {
         WorkflowExecution execution = WorkflowClient.start(workflow::start, request);
 
         WorkflowResponse responseBody = WorkflowResponse.success(execution.getWorkflowId());
+
+        return ResponseEntity.ok(responseBody);
+    }
+
+    @PostMapping("/signal")
+    public ResponseEntity<WorkflowResponse> signal(@RequestParam String wid) {
+
+        TestWorkFlow workflow = workflowClient.newWorkflowStub(TestWorkFlow.class, wid);
+//        if(workflow.getSession().getPersistData().containsKey("issignal")){
+//            WorkflowResponse responseBody = WorkflowResponse.error(wi, "Invalid stage");
+//            return ResponseEntity.ok(responseBody);
+//        }
+        //      System.out.println(workflow.getSession());
+//        ActionDataModel dt = workflow.getSession();
+        HashMap map = new HashMap();
+        map.put("issignal", "true");
+        workflow.genericSignal(map);
+        WorkflowResponse responseBody = WorkflowResponse.success(wid);
 
         return ResponseEntity.ok(responseBody);
     }

@@ -1,5 +1,6 @@
 package com.ftteporal.ft.activities;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ftteporal.ft.model.ActResult;
 import com.ftteporal.ft.model.ActionDataModel;
 import com.ftteporal.ft.services.CRMActionService;
@@ -22,12 +23,12 @@ public class TestActivitiesImpl implements TestActivities {
     @Override
     public ActResult createCRMLead(ActionDataModel param) {
         ActResult output = null;
-        try {
-            output = ctx.getBean(CRMActionService.class).execute(param);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
+        output = new ActResult();
+        output.setType("TEST");
+        output.setOutput(null);
+
+        //output = ctx.getBean(CRMActionService.class).execute(param);
+        return output;
     }
 
     @Override

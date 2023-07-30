@@ -193,10 +193,10 @@ public class TestWorkFlowImpl implements TestWorkFlow{
     }
 
     @Override
-   public ActionDataModel getSession(){
+   public HashMap<String, Object>  getSession(){
         logger.info("getSession sessionOp", sessionOp);
         printHashmap(sessionOp.getPersistData());
-        return sessionOp;
+        return null;
 
     }
 
